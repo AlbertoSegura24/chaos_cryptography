@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.10)
+project(MyProject)
+set(OpenCV_DIR /opt/homebrew/Cellar/opencv/4.12.0_12/lib/cmake/opencv4)
+find_package(OpenCV REQUIRED)
+add_executable(MyProject sbcipher.cpp)
+target_link_libraries(MyProject ${OpenCV_LIBS})

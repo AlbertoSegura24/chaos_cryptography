@@ -15,7 +15,16 @@ def pwlm(x,m1=0.8,m2=5,b1=40.8):
     elif x>=0 and x<a: return m2*x - b2
     elif x>=a: return m1*x - b1 
 
+def pwlm_cutoff(x,m1=0.8,m2=5): # Confined to family of maps PWLM:[-1,1]->[-1,1]
+    a = 1/m2
+    b1 = m1/m2
+    if x<=-a: return m1*x + b1 
+    elif x>-a and x<0: return m2*x + 1
+    elif x>=0 and x<a: return m2*x - 1
+    elif x>=a: return m1*x - b1 
+
 def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31]):
+    startT = time.time()
     x1 = [x01]
     x2 = [x02]
     m1_seq = 0
@@ -35,7 +44,11 @@ def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31]):
             if Zi not in sb: sb.append(Zi)
 
         i+=1
-            
+    
+    endT = time.time()
+    print("Time:")
+    print(endT - startT)
+    print("End, rotcont:")
     return sb
 
 def alberti_cipher(image):
