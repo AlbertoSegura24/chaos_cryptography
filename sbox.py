@@ -7,6 +7,13 @@ class Sbox:
         self.nbits=int(np.log2(self.size))
         self.rot_cont=0
 
+    def rewritehex_sbox(sbox): 
+        sbhex = bytearray(sbox).hex()
+        n = 2
+        sbstr = [sbhex[i:i+n] for i in range(0, len(sbhex), n)]
+        finstr = ', '.join(['0x'+x for x in sbstr])
+        return finstr
+
     def __decimal_to_binary_array(self, bit_length=8):
     #Convert each entry of the S-box into a binary representation
         return [np.array([int(x) for x in f"{val:0{bit_length}b}"]) for val in self.table]

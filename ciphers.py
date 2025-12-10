@@ -46,9 +46,9 @@ def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31]):
         i+=1
     
     endT = time.time()
-    print("Time:")
-    print(endT - startT)
-    print("End, rotcont:")
+    # print("Time:")
+    # print(endT - startT)
+    # print("End, rotcont:")
     return sb
 
 def alberti_cipher(image):
@@ -257,10 +257,10 @@ def enigmarot_cipher(image,xinits,params):
                 print("ya es toda we ",sboxes[k-1].rot_cont)
 
     endT = time.time()
-    print("Time:")
-    print(endT - startT)
-    print("End, rotcont:")
-    print(sboxes[0].rot_cont,sboxes[1].rot_cont,sboxes[2].rot_cont)
+    # print("Time:")
+    # print(endT - startT)
+    # print("End, rotcont:")
+    # print(sboxes[0].rot_cont,sboxes[1].rot_cont,sboxes[2].rot_cont)
     sboxes[0].reset_table()
     sboxes[1].reset_table()
     sboxes[2].reset_table()
