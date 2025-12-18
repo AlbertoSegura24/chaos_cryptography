@@ -23,7 +23,7 @@ def pwlm_cutoff(x,m1=0.8,m2=5): # Confined to family of maps PWLM:[-1,1]->[-1,1]
     elif x>=0 and x<a: return m2*x - 1
     elif x>=a: return m1*x - b1 
 
-def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31]):
+def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31],sblen=256):
     startT = time.time()
     x1 = [x01]
     x2 = [x02]
@@ -33,7 +33,7 @@ def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31]):
     sb = []
 
     i = 0
-    while len(sb) < 256:
+    while len(sb) < sblen:
         x1.append(pwlm(x1[i],f1[0],f1[1],f1[2])) #x1(n+1)=f(x1(n))
         x2.append(pwlm(x2[i],f2[0],f2[1],f2[2]))
 
@@ -50,6 +50,35 @@ def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31]):
     # print(endT - startT)
     # print("End, rotcont:")
     return sb
+
+def prng_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31],sblen=256):
+    startT = time.time()
+    x1 = [x01]
+    x2 = [x02]
+    m1_seq = 0
+    m2_seq = 0
+    delayhf = int(delay*0.5)
+    sb = []
+
+    i = 0
+    while len(sb) < sblen:
+        x1.append(pwlm(x1[i],f1[0],f1[1],f1[2])) #x1(n+1)=f(x1(n))
+        x2.append(pwlm(x2[i],f2[0],f2[1],f2[2]))
+
+        if i>= delay:
+            m1_seq = (x1[int(i-(delay))]+x1[int(i-(delayhf))]+x1[int(i)])%256
+            m2_seq = (x2[int(i-(delay))]+x2[int(i-(delayhf+1))]+x2[int(i)])%256
+            Zi = math.floor((m1_seq+m2_seq)%256)
+            sb.append(int(Zi))
+
+        i+=1
+    
+    SBseq = np.array(sb)
+    endT = time.time()
+    # print("Time:")
+    # print(endT - startT)
+    # print("End, rotcont:")
+    return SBseq.astype(np.uint8)
 
 def alberti_cipher(image):
     arr = np.array(image)

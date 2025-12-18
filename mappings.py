@@ -1,9 +1,6 @@
-import math
 import numpy as np
-import matplotlib.pyplot as plt
-import secrets as scrt
 
-def pwlm(x,m1=0.8,m2=5,b1=40.8):
+def pwlm(x,m1=0.8,m2=5,b1=4):
     a = b1/m1
     b2 = b1*(m2/m1)
     if x<=-a: return m1*x + b1 
@@ -11,12 +8,15 @@ def pwlm(x,m1=0.8,m2=5,b1=40.8):
     elif x>=0 and x<a: return m2*x - b2
     elif x>=a: return m1*x - b1 
 
-def der_pwl(x,m1=0.8,m2=5,b1=40.8):
+def der_pwl(x,m1=0.8,m2=5,b1=4):
     a = b1/m1 
     if x<=-a: return m1
     elif x>-a and x<0: return m2
     elif x>=0 and x<a: return m2
     elif x>=a: return m1
+
+def frac_part(x):
+    return x - np.floor(x)
 
 def pwlm_cutoff(x,m1=0.8,m2=5): # Confined to family of maps PWLM:[-1,1]->[-1,1]
     a = 1/m2
@@ -47,12 +47,12 @@ def der_tent(x,a=2):
     if x <= 0.5 and x >= 0: return a*x
     if x > 0.5 and x <= 1: return -a
 
-def mapping_pwlmOrbit(dyn_system,xinit,dyn_sysparams=[0.8,5,40.8],orbit_size=0):
+def mapping_pwlmOrbit(xinit,dyn_sysparams=[0.8,5,40.8],orbit_size=0):
     b2 = (dyn_sysparams[1]/dyn_sysparams[0])*dyn_sysparams[2]
     x = np.linspace(-b2,b2,500)
     y = []
     for i in range(len(x)):
-        y.append(dyn_system(x[i],dyn_sysparams[0],dyn_sysparams[1],dyn_sysparams[2]))
+        y.append(pwlm(x[i],dyn_sysparams[0],dyn_sysparams[1],dyn_sysparams[2]))
 
     if orbit_size>0:
         px, py = np.empty((2,orbit_size+1))
@@ -62,7 +62,7 @@ def mapping_pwlmOrbit(dyn_system,xinit,dyn_sysparams=[0.8,5,40.8],orbit_size=0):
 
         for n in range(1, orbit_size, 2):
             px[n] = px[n-1]
-            py[n] = dyn_system(px[n-1],dyn_sysparams[0],dyn_sysparams[1],dyn_sysparams[2])
+            py[n] = pwlm(px[n-1],dyn_sysparams[0],dyn_sysparams[1],dyn_sysparams[2])
             px[n+1] = py[n]
             py[n+1] = py[n]
         
