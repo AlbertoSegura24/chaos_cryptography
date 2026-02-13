@@ -1,3 +1,4 @@
+from operator import itemgetter
 import numpy as np
 
 class Sbox:
@@ -6,6 +7,15 @@ class Sbox:
         self.size=len(sbarray)
         self.nbits=int(np.log2(self.size))
         self.rot_cont=0
+
+        dtypee = [('SBval',int),('ID',int)]
+        values = [(sval,i) for i,sval in enumerate(sbarray)]
+        SBsort = np.array(values,dtype=dtypee)
+        SBsorted = np.sort(SBsort,order='SBval')
+
+        self.invtable = list(map(itemgetter(1), SBsorted))
+
+
 
     def rewritehex_sbox(sbox): 
         sbhex = bytearray(sbox).hex()
@@ -206,6 +216,7 @@ class Sbox:
         tex_sbox = "\\".join(str(x) for x in tex_sbox)
         return tex_sbox
 
+
     def encode_image(self,image):
         image_arr = np.array(image)
         rows, cols = np.shape(image_arr)
@@ -222,7 +233,7 @@ class Sbox:
         for i in range(rows):
             for j in range(cols):
                 encoded_val = image_arr[i, j]
-                image_arr[i, j] = self.table.index(encoded_val)
+                image_arr[i, j] = self.invtable[encoded_val]
 
         return image_arr
     

@@ -44,7 +44,7 @@ def tent(x,a=2):
     if x > 0.5 and x <= 1: return a*(1-x)
 
 def der_tent(x,a=2):
-    if x <= 0.5 and x >= 0: return a*x
+    if x <= 0.5 and x >= 0: return a
     if x > 0.5 and x <= 1: return -a
 
 def mapping_pwlmOrbit(xinit,dyn_sysparams=[0.8,5,40.8],orbit_size=0):
@@ -55,7 +55,7 @@ def mapping_pwlmOrbit(xinit,dyn_sysparams=[0.8,5,40.8],orbit_size=0):
         y.append(pwlm(x[i],dyn_sysparams[0],dyn_sysparams[1],dyn_sysparams[2]))
 
     if orbit_size>0:
-        px, py = np.empty((2,orbit_size+1))
+        px, py = np.empty((2,orbit_size))
         px[0], py[0] = xinit, 0
 
         # Cobweb diagram

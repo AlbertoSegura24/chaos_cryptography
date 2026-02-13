@@ -249,6 +249,7 @@ def psnr(imageA,imageB):
 def enigmarot_cipher(image,xinits,params):
     k=3
     img_array = np.array(image)
+    auximg1, auximg2 = np.array(image), np.array(image)
     n,m = img_array.shape[0],img_array.shape[1]
     startT = time.time()
     sboxes = [Sbox(generate_sbox(xinits[i][0],xinits[i][1],f1=params[0],f2=params[1])) for i in range(k)]
@@ -261,7 +262,9 @@ def enigmarot_cipher(image,xinits,params):
     for c in range(n):
         for r in range(m):
             aux = sboxes[0].table[int(img_array[c,r])]
+            auximg1[c,r] = aux
             aux = sboxes[1].table[int(aux)]
+            auximg2[c,r] = aux
             aux = sboxes[2].table[int(aux)]
             cipher_arr[c,r] = aux
             sboxes[k-k].rotation()
@@ -298,7 +301,7 @@ def enigmarot_cipher(image,xinits,params):
     # print(sboxes[2].table)
     rot_cont = [sboxes[0].rot_cont,sboxes[1].rot_cont,sboxes[2].rot_cont]
     
-    return cipher_arr,xinits,rot_cont,sboxes
+    return cipher_arr,auximg1,auximg2,xinits,sboxes
 
 def enigmarot_decipher(image,xinits,params):
     k=3
