@@ -15,8 +15,6 @@ class Sbox:
 
         self.invtable = list(map(itemgetter(1), SBsorted))
 
-
-
     def rewritehex_sbox(sbox): 
         sbhex = bytearray(sbox).hex()
         n = 2

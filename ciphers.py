@@ -110,7 +110,7 @@ def encode_image(image, sbox):
 
     return image
 
-def plot_image_and_histogram(image_array):
+def plot_image_and_histogram(image_array,uniform=0):
     # Calcular el histograma
     histogram, bins = np.histogram(image_array, bins=256, range=(0, 256))
 
@@ -127,6 +127,7 @@ def plot_image_and_histogram(image_array):
     # Mostrar el histograma
     axs[1].bar(bins[:-1], histogram, width=1, color='black', edgecolor='black', align='edge')
     axs[1].set_xlim(0, 255)
+
     #axs[1].set_title("Histograma")
     #axs[1].set_xlabel("Intensidad de Gris")
     axs[1].set_ylabel("Frecuencia",fontsize=18)
@@ -134,7 +135,7 @@ def plot_image_and_histogram(image_array):
 
     #Crear la barra de escala de grises debajo del histograma
     x_span = bins.max()-bins.min()
-    C = [cm(((x-bins.min())/x_span)) for x in bins]
+    C = [cm(((bins.max()-x)/x_span)) for x in bins]
     axs[1].bar(bins[:-1], histogram, width=bins[1]-bins[0], color=C, alpha=0.8)
 
     plt.xticks(fontsize=16)
@@ -165,7 +166,7 @@ def plot_histogram(image):
     #Crear la barra de escala de grises debajo del histograma
     x_span = bins.max()-bins.min()
     cm = plt.cm.get_cmap('Greys')
-    C = [cm(((x-bins.min())/x_span)) for x in bins]
+    C = [cm(((bins.max()-x)/x_span)) for x in bins]
     ax.bar(bins[:-1], histogram, width=bins[1]-bins[0], color=C, alpha=0.8)
 
 
@@ -174,7 +175,7 @@ def plot_histogram(image):
     plt.tight_layout()
     plt.show()
 
-    return fig,ax
+    return histogram,bins
 
 def plot_image(image):
     image_array = np.array(image)
@@ -242,9 +243,46 @@ def mse(imageA, imageB):
 	return err
 
 def psnr(imageA,imageB):
-	mse_val = mse(imageA,imageB)
+	mse_val = mse(np.array(imageA),np.array(imageB))
 	psnr_val = 10*np.log10((255**2)/mse_val)#np.sqrt(mse_val))
 	return mse_val,psnr_val
+
+### Three modules for npcr testing ###
+def rateofchange(height,width,pixel1,pixel2,matrix):
+
+    for y in range(0,height):
+        for x in range(0,width):
+            #print(x,y)
+            if pixel1[x,y] == pixel2[x,y]:
+                matrix[x,y]=0
+            else:
+                matrix[x,y]=1
+    return matrix
+
+# sum of the values of 1 stored in matrix is calculated
+def sumofpixel_uaci(height,width,pixel1,pixel2,ematrix):
+    matrix=rateofchange(height,width,pixel1,pixel2,ematrix)
+    psum=0
+    uaci=0
+    for y in range(0,height):
+        for x in range(0,width):
+            psum=matrix[x,y]+psum
+            uaci=(abs(pixel1[x,y]-pixel2[x,y])/255)+uaci
+
+    uaci=(uaci/(width*height))*100
+
+    return psum,uaci
+
+# Finally the above two module is called to calculate the values
+def npcrv_uaci(img1,img2):
+    pixel1 = np.array(img1)
+    pixel2 = np.array(img2)
+    width, height = np.shape(pixel1)
+    ematrix = np.empty([width, height])
+    psum,uaci = sumofpixel_uaci(height,width,pixel1,pixel2,ematrix)
+    per=(((psum  /(height*width))*100))
+    return per,uaci
+
 
 def enigmarot_cipher(image,xinits,params):
     k=3
