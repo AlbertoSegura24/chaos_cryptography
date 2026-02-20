@@ -145,7 +145,7 @@ def plot_image_and_histogram(image_array,uniform=0):
     
     return bins,histogram
 
-def plot_histogram(image):
+def plot_histogram(image,tosave=0):
 
     image_array = np.array(image)
 
@@ -173,9 +173,13 @@ def plot_histogram(image):
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     plt.tight_layout()
-    plt.show()
+    if tosave!=0:
+        plt.savefig(tosave)
+        
+    else: 
+        plt.show()
+        return histogram,bins
 
-    return histogram,bins
 
 def plot_image(image):
     image_array = np.array(image)
