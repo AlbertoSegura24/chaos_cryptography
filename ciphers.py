@@ -31,16 +31,18 @@ def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31],sblen=256):
     m2_seq = 0
     delayhf = int(delay*0.5)
     sb = []
-
+    zet = []
     i = 0
+
     while len(sb) < sblen:
         x1.append(pwlm(x1[i],f1[0],f1[1],f1[2])) #x1(n+1)=f(x1(n))
         x2.append(pwlm(x2[i],f2[0],f2[1],f2[2]))
 
-        if i>= delay:
+        if i>= 1000:
             m1_seq = (x1[int(i-(delay))]+x1[int(i-(delayhf))]+x1[int(i)])%256
             m2_seq = (x2[int(i-(delay))]+x2[int(i-(delayhf+1))]+x2[int(i)])%256
             Zi = math.floor((m1_seq+m2_seq)%256)
+            zet.append(Zi)
             if Zi not in sb: sb.append(Zi)
 
         i+=1
@@ -49,7 +51,7 @@ def generate_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31],sblen=256):
     # print("Time:")
     # print(endT - startT)
     # print("End, rotcont:")
-    return sb
+    return sb,zet
 
 def prng_sbox(x01,x02,delay=10,f1=[0.8,5,40.8],f2=[0.9,4,31],sblen=256):
     startT = time.time()
@@ -88,13 +90,13 @@ def alberti_cipher(image):
     encode_arr = np.zeros((n,m))
 
     for i in range(n):
-        x01,x02 = random.randint(0,255),random.randint(0,255)
-        m1_params = np.random.random_integers(8000,10000,2)/10000
+        x01,x02 = np.random.uniform(0,255),np.random.uniform(0,255)
+        m1_params = np.random.random_integers(8000,9999,2)/10000
         m2_params = np.random.random_integers(2000,10000,2)/1000
-        b1_params = np.random.random_integers(8000,50000,2)/1000
+        b1_params = np.random.random_integers(25000,50000,2)/1000
         func1 = [m1_params[0],m2_params[0],b1_params[0]]
         func2 = [m1_params[1],m2_params[1],b1_params[1]]
-        sb = generate_sbox(x01,x02,10,func1,func2)
+        sb,zet = generate_sbox(x01,x02,10,func1,func2)
         for j in range(m):    
             encode_arr[i,j] = sb[arr[i,j]]
         
@@ -160,7 +162,7 @@ def plot_histogram(image,tosave=0):
     #axs[1].set_title("Histograma")
     #axs[1].set_xlabel("Intensidad de Gris")
     
-    ax.set_ylabel("Frecuencia",fontsize=17)
+    ax.set_ylabel("Frequency",fontsize=17)
 
 
     #Crear la barra de escala de grises debajo del histograma
@@ -216,10 +218,10 @@ def calculate_pixel_correlation(image):
     )[0]
     
     return {
-        "Horizontal": np.round(corr_horz,5),
-        "Vertical": np.round(corr_vert,5),
-        "Diagonal": np.round(corr_diag,5),
-        "Avg": np.round((corr_diag+corr_horz+corr_vert)/3,5)
+        "Horizontal": np.round(corr_horz,6),
+        "Vertical": np.round(corr_vert,6),
+        "Diagonal": np.round(corr_diag,6),
+        "Avg": np.round((corr_diag+corr_horz+corr_vert)/3,6)
     }
 
 def calculate_image_entropy(image):
@@ -233,7 +235,7 @@ def calculate_image_entropy(image):
         else: continue
 
     
-    return entropy
+    return np.round(entropy,4)
 
 def mse(imageA, imageB):
 	# the 'Mean Squared Error' between the two images is the
@@ -249,7 +251,7 @@ def mse(imageA, imageB):
 def psnr(imageA,imageB):
 	mse_val = mse(np.array(imageA),np.array(imageB))
 	psnr_val = 10*np.log10((255**2)/mse_val)#np.sqrt(mse_val))
-	return mse_val,psnr_val
+	return np.round(mse_val,5),np.round(psnr_val,5)
 
 ### Three modules for npcr testing ###
 def rateofchange(height,width,pixel1,pixel2,matrix):
@@ -285,7 +287,7 @@ def npcrv_uaci(img1,img2):
     ematrix = np.empty([width, height])
     psum,uaci = sumofpixel_uaci(height,width,pixel1,pixel2,ematrix)
     per=(((psum  /(height*width))*100))
-    return per,uaci
+    return np.round(per,5),np.round(uaci,5)
 
 
 def enigmarot_cipher(image,xinits,params):
