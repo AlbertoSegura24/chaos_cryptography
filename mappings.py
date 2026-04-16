@@ -88,7 +88,7 @@ def bls_cutoffs(m,p,r):
 def binary_split(xi,xsep):
     xsep = sorted(xsep,reverse=True)
     xbin=0
-    print(xi,xsep,xbin)
+    # print(xi,xsep,xbin)
     for i,xcut in enumerate(xsep):
         # print(xbin)
         if xi >= xcut:
@@ -97,6 +97,17 @@ def binary_split(xi,xsep):
         xbin+=(-1)**(i)
 
     return xbin
+
+def bls_binaryOrbit(x0,params=np.array([[19.4,10.5,8.2],[21.4,9.5,8.2]]),orbsize=10000):
+    bls_xseps = bls_cutoffs(params[0,0],params[0,1],params[0,2])
+    xorb = [x0]
+    xbin = [binary_split(xorb[0],bls_xseps)]
+    for i in range(orbsize):
+        xorb.append(bls_map(xorb[i],params[0,0],params[0,1],params[0,2]))
+        xbin.append(binary_split(abs(xorb[i]),bls_xseps))
+        # print(xorb[i],xbin[i])
+    
+    return xbin,xorb
 
 def frac_part(x):
     return x - np.floor(x)
